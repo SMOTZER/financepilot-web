@@ -1235,7 +1235,7 @@ function App() {
       try {
         const clientId = GOOGLE_WEB_CLIENT_ID || devRef.current.clientId;
         if (!clientId) throw new Error("Add the Google client ID first.");
-        const token = await googleToken(clientId, interactive, s0.email);
+        const token = await googleToken(clientId, interactive, s0.email, s0.connected);
         const s = {
           ...(devRef.current.sync || {})
         };
@@ -1384,6 +1384,18 @@ function App() {
       syncBusy.current = null;
     }
   };
+  // Laptop: Google gives a web page a 1-hour pass. When it runs out, the first click anywhere reconnects quietly.
+  useEffect(() => {
+    if (native || syncStatus.state !== "auth" || !(dev.sync && dev.sync.connected)) return;
+    const once = () => {
+      document.removeEventListener("pointerdown", once, true);
+      syncNow({
+        interactive: true
+      });
+    };
+    document.addEventListener("pointerdown", once, true);
+    return () => document.removeEventListener("pointerdown", once, true);
+  }, [syncStatus.state, dev.sync && dev.sync.connected]);
   const connectDrive = async () => {
     setSync({
       enabled: true,
@@ -9907,7 +9919,7 @@ function authErr(msg) {
   e.auth = true;
   return e;
 }
-async function googleToken(clientId, interactive, email) {
+async function googleToken(clientId, interactive, email, known) {
   if (_tok && _tok.exp > Date.now() + 60000) return _tok.token;
   if (isNative()) {
     const SL = plug("SocialLogin");
@@ -9951,7 +9963,7 @@ async function googleToken(clientId, interactive, email) {
     return token;
   }
   try {
-    const c = JSON.parse(sessionStorage.getItem("fp_tok"));
+    const c = JSON.parse(localStorage.getItem("fp_tok") || sessionStorage.getItem("fp_tok"));
     if (c && c.exp > Date.now() + 60000) {
       _tok = c;
       return c.token;
@@ -9969,7 +9981,7 @@ async function googleToken(clientId, interactive, email) {
       error_callback: x => rej(authErr(x && x.type === "popup_closed" ? "Sign-in window closed." : "Couldn't sign in to Google."))
     });
     tc.requestAccessToken({
-      prompt: email ? "" : "consent"
+      prompt: email || known ? "" : "consent"
     });
   });
   _tok = {
@@ -9977,7 +9989,7 @@ async function googleToken(clientId, interactive, email) {
     exp: Date.now() + ((r.expires_in || 3600) - 300) * 1000
   };
   try {
-    sessionStorage.setItem("fp_tok", JSON.stringify(_tok));
+    localStorage.setItem("fp_tok", JSON.stringify(_tok));
   } catch (e) {}
   return _tok.token;
 }
@@ -9985,6 +9997,7 @@ async function googleSignOut() {
   _tok = null;
   try {
     sessionStorage.removeItem("fp_tok");
+    localStorage.removeItem("fp_tok");
   } catch (e) {}
   if (isNative()) {
     try {
@@ -10007,6 +10020,7 @@ async function gfetch(token, url, opts) {
     _tok = null;
     try {
       sessionStorage.removeItem("fp_tok");
+      localStorage.removeItem("fp_tok");
     } catch (e) {}
     throw authErr("Google sign-in expired. Tap to reconnect.");
   }
