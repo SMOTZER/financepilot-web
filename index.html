@@ -675,6 +675,27 @@ const PAYMENT_METHODS = [{
   isCreditCard: true
 }];
 
+// Which account pays each card: the user's choice (payConfig.cardFrom), else the default above
+let _cardFrom = {};
+const cardAcct = id => _cardFrom[id] || (PAYMENT_METHODS.find(p => p.id === id) || {}).accountId || "";
+const isCardPmt = t => !!(PAYMENT_METHODS.find(p => p.id === t.paymentMethod && p.isCreditCard) && t.category === "Credit Card");
+// One rule for how any transaction moves balances: account by its amount; a card charge raises the card, a card payment lowers it
+function applyTxnEffect(t, sign, setAccounts, setCcBalances) {
+  const r = n => Math.round(n * 100) / 100;
+  if (t.accountId) setAccounts(p => p.map(a => a.id === t.accountId ? {
+    ...a,
+    balance: r((a.balance || 0) + sign * t.amount)
+  } : a));
+  const card = PAYMENT_METHODS.find(p => p.id === t.paymentMethod && p.isCreditCard);
+  if (card) {
+    const d = isCardPmt(t) ? t.amount : -t.amount;
+    setCcBalances(p => ({
+      ...p,
+      [card.id]: r((p[card.id] || 0) + sign * d)
+    }));
+  }
+}
+
 // CC balances stored as { bestbuy: 0, ppgcc: 0 } — sum of uncleared CC charges
 const DEFAULT_CC_BALANCES = {
   bestbuy: 0,
@@ -991,6 +1012,7 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [menu, setMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  _cardFrom = payConfig && payConfig.cardFrom || {};
   const importRef = useRef();
   const native = isNative();
 
@@ -1635,38 +1657,12 @@ function App() {
 
   // Delete a transaction and reverse its effect on account/CC balances
   const deleteTransaction = txn => {
-    if (txn.paymentMethod && txn.amount < 0) {
-      const pm = pmMap[txn.paymentMethod];
-      if (pm?.isCreditCard && !(txn.isTransfer && txn.category === "Credit Card")) {
-        setCcBalances(p => ({
-          ...p,
-          [txn.paymentMethod]: Math.round(((p[txn.paymentMethod] || 0) - Math.abs(txn.amount)) * 100) / 100
-        }));
-      }
-    }
-    if (txn.accountId) {
-      setAccounts(p => p.map(a => a.id === txn.accountId ? {
-        ...a,
-        balance: (a.balance || 0) - txn.amount
-      } : a));
-    }
+    applyTxnEffect(txn, -1, setAccounts, setCcBalances);
     setTxns(p => p.filter(t => t.id !== txn.id));
   };
   const addTransaction = txn => {
     setTxns(p => [txn, ...p]);
-    if (txn.accountId) setAccounts(p => p.map(a => a.id === txn.accountId ? {
-      ...a,
-      balance: Math.round(((a.balance || 0) + txn.amount) * 100) / 100
-    } : a));
-    if (txn.paymentMethod) {
-      const pm = pmMap[txn.paymentMethod];
-      if (pm?.isCreditCard && txn.amount < 0) {
-        setCcBalances(p => ({
-          ...p,
-          [txn.paymentMethod]: (p[txn.paymentMethod] || 0) + Math.abs(txn.amount)
-        }));
-      }
-    }
+    applyTxnEffect(txn, 1, setAccounts, setCcBalances);
   };
 
   // Log CC payment (reduces balance) or interest charge (increases balance)
@@ -1680,22 +1676,31 @@ function App() {
       showToast(`${pm?.name} balance set to ${fmt(amount)}.`);
       return;
     }
-    if (action === "pay") {
-      setCcBalances(p => ({
+    if (action === "from") {
+      setPayConfig(p => ({
         ...p,
-        [pmId]: Math.round(((p[pmId] || 0) - amount) * 100) / 100
+        cardFrom: {
+          ...(p && p.cardFrom || {}),
+          [pmId]: amount
+        }
       }));
-      setTxns(p => [{
+      showToast(`${pm?.name} is now paid from ${(accounts.find(a => a.id === amount) || {}).name || "no account"}.`);
+      return;
+    }
+    if (action === "pay") {
+      const from = (date && typeof date === "object" ? date.from : null) || cardAcct(pmId);
+      const day = date && typeof date === "object" ? date.date : date;
+      addTransaction({
         id: uid(),
-        date,
+        date: day,
         desc: `${pm?.name} payment`,
         amount: -amount,
         category: "Credit Card",
-        accountId: pm?.accountId || "",
+        accountId: from,
         paymentMethod: pmId,
         isTransfer: true
-      }, ...p]);
-      showToast(`✅ ${pm?.name} payment of ${fmt(amount)} logged.`);
+      });
+      showToast(`✅ ${pm?.name} payment of ${fmt(amount)} logged from ${(accounts.find(a => a.id === from) || {}).name || "no account"}.`);
     } else if (action === "interest") {
       setCcBalances(p => ({
         ...p,
@@ -2029,7 +2034,7 @@ function App() {
       fontSize: 10,
       color: "#6a8c80"
     }
-  }, "v3.0"), isPhone ? /*#__PURE__*/React.createElement("button", {
+  }, "v3.1"), isPhone ? /*#__PURE__*/React.createElement("button", {
     onClick: () => setMenu(true),
     style: {
       marginLeft: "auto",
@@ -2902,6 +2907,7 @@ function CcPaymentCard({
   stmt
 }) {
   const [mode, setMode] = useState(null); // null | "pay" | "interest"
+  const [fromAcc, setFromAcc] = useState(cardAcct(pm.id));
   const [payAmt, setPayAmt] = useState("");
   const [intAmt, setIntAmt] = useState("");
   const [setAmt, setSetAmt] = useState("");
@@ -2924,7 +2930,11 @@ function CcPaymentCard({
   const handlePay = () => {
     const amt = parseFloat(payAmt);
     if (!amt || amt <= 0) return;
-    clearCcBalance(pm.id, "pay", amt, actionDate);
+    clearCcBalance(pm.id, "pay", amt, {
+      date: actionDate,
+      from: fromAcc
+    });
+    if (fromAcc !== cardAcct(pm.id)) clearCcBalance(pm.id, "from", fromAcc);
     setPayAmt("");
     setMode(null);
   };
@@ -2962,11 +2972,29 @@ function CcPaymentCard({
       color: "#6a8c80",
       marginBottom: 12
     }
-  }, "Paid from: ", /*#__PURE__*/React.createElement("span", {
+  }, "Paid from:", " ", /*#__PURE__*/React.createElement("select", {
+    value: cardAcct(pm.id),
+    onChange: e => {
+      setFromAcc(e.target.value);
+      clearCcBalance(pm.id, "from", e.target.value);
+    },
     style: {
-      color: accMap[pm.accountId]?.color
+      background: "transparent",
+      border: "none",
+      borderBottom: "1px dashed #1f4439",
+      color: accMap[cardAcct(pm.id)]?.color || "#8fb3a6",
+      fontSize: 11,
+      padding: 0,
+      cursor: "pointer"
     }
-  }, accMap[pm.accountId]?.name)), /*#__PURE__*/React.createElement("div", {
+  }, Object.values(accMap).map(a => /*#__PURE__*/React.createElement("option", {
+    key: a.id,
+    value: a.id,
+    style: {
+      color: "#ecfdf5",
+      background: "#0d1f19"
+    }
+  }, a.name)))), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 10,
       marginTop: -4
@@ -2982,6 +3010,7 @@ function CcPaymentCard({
     onClick: () => {
       setMode("pay");
       setActionDate(today());
+      setFromAcc(cardAcct(pm.id));
     },
     style: {
       flex: 1,
@@ -3093,7 +3122,19 @@ function CcPaymentCard({
       boxSizing: "border-box",
       marginBottom: 6
     }
-  }), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("select", {
+    value: fromAcc,
+    onChange: e => setFromAcc(e.target.value),
+    style: {
+      ...inp,
+      width: "100%",
+      boxSizing: "border-box",
+      marginBottom: 6
+    }
+  }, Object.values(accMap).map(a => /*#__PURE__*/React.createElement("option", {
+    key: a.id,
+    value: a.id
+  }, "From ", a.name))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 6,
@@ -10384,7 +10425,10 @@ function Transactions({
       id: uid(),
       amount,
       // CC transactions don't touch an account until the bill is paid
-      accountId: pm?.isCreditCard ? "" : form.accountId || pm?.accountId || ""
+      accountId: pm?.isCreditCard ? form.category === "Credit Card" ? form.accountId || cardAcct(pm.id) : "" : form.accountId || pm?.accountId || "",
+      ...(pm?.isCreditCard && form.category === "Credit Card" ? {
+        isTransfer: true
+      } : {})
     };
     delete txn.splits;
     const sp = finishSplits(form.splits, amount);
@@ -10413,7 +10457,7 @@ function Transactions({
     setForm(f => ({
       ...f,
       paymentMethod: pmId,
-      accountId: pm?.isCreditCard ? "" : pm?.accountId || f.accountId
+      accountId: pm?.isCreditCard ? f.category === "Credit Card" ? cardAcct(pmId) : "" : pm?.accountId || f.accountId
     }));
   };
   const startEdit = t => {
@@ -10429,12 +10473,14 @@ function Transactions({
     const oldTxn = txns.find(t => t.id === editId);
     const newAmount = parseFloat(editForm.amount);
     const newPm = PAYMENT_METHODS.find(p => p.id === editForm.paymentMethod);
-    const newAccountId = newPm?.isCreditCard ? "" : editForm.accountId || "";
+    const payCard = newPm?.isCreditCard && editForm.category === "Credit Card";
+    const newAccountId = newPm?.isCreditCard ? payCard ? editForm.accountId || cardAcct(newPm.id) : "" : editForm.accountId || "";
     const newTxn = {
       ...editForm,
       amount: newAmount,
       accountId: newAccountId
     };
+    if (payCard) newTxn.isTransfer = true;
     delete newTxn.splits;
     const sp = finishSplits(editForm.splits, newAmount);
     if (!sp.ok) {
@@ -10445,40 +10491,8 @@ function Transactions({
       newTxn.splits = sp.splits;
       newTxn.category = sp.category;
     }
-
-    // Reverse old transaction's balance effects
-    if (oldTxn) {
-      // Reverse old CC balance
-      if (oldTxn.paymentMethod && oldTxn.amount < 0) {
-        const oldPm = pmMap[oldTxn.paymentMethod];
-        if (oldPm?.isCreditCard) {
-          setCcBalances(p => ({
-            ...p,
-            [oldTxn.paymentMethod]: Math.round(((p[oldTxn.paymentMethod] || 0) - Math.abs(oldTxn.amount)) * 100) / 100
-          }));
-        }
-      }
-      // Reverse old account balance
-      if (oldTxn.accountId) {
-        setAccounts(p => p.map(a => a.id === oldTxn.accountId ? {
-          ...a,
-          balance: (a.balance || 0) - oldTxn.amount
-        } : a));
-      }
-    }
-
-    // Apply new transaction's balance effects
-    if (newPm?.isCreditCard && newAmount < 0) {
-      setCcBalances(p => ({
-        ...p,
-        [editForm.paymentMethod]: (p[editForm.paymentMethod] || 0) + Math.abs(newAmount)
-      }));
-    } else if (newAccountId) {
-      setAccounts(p => p.map(a => a.id === newAccountId ? {
-        ...a,
-        balance: (a.balance || 0) + newAmount
-      } : a));
-    }
+    if (oldTxn) applyTxnEffect(oldTxn, -1, setAccounts, setCcBalances);
+    applyTxnEffect(newTxn, 1, setAccounts, setCcBalances);
     setTxns(p => p.map(t => t.id === editId ? newTxn : t));
     setEditId(null);
     setEditForm(null);
@@ -10595,13 +10609,27 @@ function Transactions({
       width: 140
     },
     value: form.category,
-    onChange: e => setForm(p => ({
-      ...p,
-      category: e.target.value
-    }))
+    onChange: e => {
+      const c = e.target.value;
+      setForm(p => {
+        if (c !== "Credit Card") return {
+          ...p,
+          category: c
+        };
+        const pm = pmMap[p.paymentMethod]?.isCreditCard ? p.paymentMethod : PAYMENT_METHODS.find(x => x.isCreditCard).id;
+        return {
+          ...p,
+          category: c,
+          paymentMethod: pm,
+          accountId: cardAcct(pm)
+        };
+      });
+    }
   }, /*#__PURE__*/React.createElement("option", {
     value: "Income"
-  }, "Income"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
+  }, "Income"), /*#__PURE__*/React.createElement("option", {
+    value: "Credit Card"
+  }, "💳 Card payment"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
     key: c.name
   }, c.name))), /*#__PURE__*/React.createElement("select", {
     style: {
@@ -10613,7 +10641,7 @@ function Transactions({
   }, PAYMENT_METHODS.map(p => /*#__PURE__*/React.createElement("option", {
     key: p.id,
     value: p.id
-  }, p.name))), !pmMap[form.paymentMethod]?.isCreditCard && /*#__PURE__*/React.createElement("select", {
+  }, p.name))), (!pmMap[form.paymentMethod]?.isCreditCard || form.category === "Credit Card") && /*#__PURE__*/React.createElement("select", {
     style: {
       ...inp,
       width: 140
@@ -10932,9 +10960,11 @@ function Transactions({
       }))
     }, /*#__PURE__*/React.createElement("option", {
       value: "Income"
-    }, "Income"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
+    }, "Income"), /*#__PURE__*/React.createElement("option", {
+      value: "Credit Card"
+    }, "💳 Card payment"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
       key: c.name
-    }, c.name))), !pmMap[editForm.paymentMethod]?.isCreditCard && /*#__PURE__*/React.createElement("select", {
+    }, c.name))), (!pmMap[editForm.paymentMethod]?.isCreditCard || editForm.category === "Credit Card") && /*#__PURE__*/React.createElement("select", {
       style: {
         ...inp,
         width: 140,
