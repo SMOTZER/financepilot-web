@@ -2034,7 +2034,7 @@ function App() {
       fontSize: 10,
       color: "#6a8c80"
     }
-  }, "v3.2"), isPhone ? /*#__PURE__*/React.createElement("button", {
+  }, "v3.3"), isPhone ? /*#__PURE__*/React.createElement("button", {
     onClick: () => setMenu(true),
     style: {
       marginLeft: "auto",
@@ -8853,6 +8853,19 @@ async function ocrWorker() {
         if (!r.ok) throw new Error("Receipt reader files are missing (" + p + ").");
         return r.arrayBuffer();
       };
+      // Android's build renames ".gz" files, so the language file ships as ".bin"; try each name it could have
+      const getLang = async () => {
+        for (const p of ["ocr/lang/eng.traineddata.bin", "ocr/lang/eng.traineddata.gz", "ocr/lang/eng.traineddata"]) {
+          try {
+            const r = await fetch(new URL(p, location.href).href);
+            if (r.ok) {
+              const b = await r.arrayBuffer();
+              if (b.byteLength > 100000) return b;
+            }
+          } catch (e) {}
+        }
+        throw new Error("Receipt reader's language file is missing from this build.");
+      };
       const simd = (() => {
         try {
           return WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]));
@@ -8860,7 +8873,7 @@ async function ocrWorker() {
           return false;
         }
       })();
-      const [wkBuf, core, lang] = await Promise.all([get("ocr/worker.min.js"), get(simd ? "ocr/tesseract-core-simd-lstm.wasm.js" : "ocr/tesseract-core-lstm.wasm.js"), get("ocr/lang/eng.traineddata.gz")]);
+      const [wkBuf, core, lang] = await Promise.all([get("ocr/worker.min.js"), get(simd ? "ocr/tesseract-core-simd-lstm.wasm.js" : "ocr/tesseract-core-lstm.wasm.js"), getLang()]);
       // tesseract.js 5.1.1 names a language given as data by its bytes instead of its code; fix that in the worker text
       const wk = new TextDecoder().decode(wkBuf).replace('return"string"==typeof t?t:t.data}', 'return"string"==typeof t?t:t.code}');
       const url = (buf, type) => URL.createObjectURL(new Blob([buf], {
