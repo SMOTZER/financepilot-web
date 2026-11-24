@@ -1193,7 +1193,8 @@ function App() {
     setSchedMeta(s.schedMeta || {});
     setBtcBuys(s.btcBuys || []);
     if (s.btcPrice) setBtcPrice(s.btcPrice);
-    setStmtLog(s.stmtLog || {});
+    // Bank-account checks used to be saved as "acct:acc1"; the account tiles look for "acc1"
+    setStmtLog(Object.fromEntries(Object.entries(s.stmtLog || {}).map(([k, v]) => [k.replace(/^acct:/, ""), v])));
   };
 
   // Load saved data once
@@ -2036,7 +2037,7 @@ function App() {
       fontSize: 10,
       color: "#6a8c80"
     }
-  }, "v3.4"), isPhone ? /*#__PURE__*/React.createElement("button", {
+  }, "v3.5"), isPhone ? /*#__PURE__*/React.createElement("button", {
     onClick: () => setMenu(true),
     style: {
       marginLeft: "auto",
@@ -8310,6 +8311,7 @@ function StatementCheck({
   const [showMatched, setShowMatched] = useState(false);
   const fileRef = useRef();
   const isAcct = target.startsWith("acct:");
+  const logKey = target.startsWith("acct:") ? target.slice(5) : target;
   const acctId = isAcct ? target.slice(5) : "";
   const card = isAcct ? null : PAYMENT_METHODS.find(p => p.id === target);
   const acc = accounts.find(a => a.id === acctId);
@@ -8496,7 +8498,7 @@ function StatementCheck({
       const thru = res.meta.closing && res.meta.closing >= res.to ? res.meta.closing : res.to;
       setStmtLog(p => ({
         ...p,
-        [target]: {
+        [isAcct ? acctId : target]: {
           thru,
           from: res.from,
           checkedAt: localToday(),
@@ -8676,7 +8678,7 @@ function StatementCheck({
       fontSize: 11,
       color: "#6a8c80"
     }
-  }, stmtLog?.[target] ? `Last PDF statement for ${label}: through ${stmtLog[target].thru}, checked ${stmtLog[target].checkedAt}.` : `No PDF statement checked yet for ${label}.`, " CSV checks catch up on transactions but don't count as a statement."), err && /*#__PURE__*/React.createElement("div", {
+  }, stmtLog?.[logKey] ? `Last PDF statement for ${label}: through ${stmtLog[logKey].thru}, checked ${stmtLog[logKey].checkedAt}.` : `No PDF statement checked yet for ${label}.`, " CSV checks catch up on transactions but don't count as a statement."), err && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#f87171",
