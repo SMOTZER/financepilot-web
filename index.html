@@ -371,6 +371,8 @@ let _st=null;function debouncedSave(s){clearTimeout(_st);_st=setTimeout(()=>save
 function SvgPie({data,colorFn}){const [tt,setTt]=React.useState(null);if(!data||!data.length)return null;const tot=data.reduce((s,d)=>s+d.value,0);if(!tot)return null;const cx=88,cy=76,r=62,ri=34;let a=-Math.PI/2;const sl=data.map(d=>{const sw=(d.value/tot)*2*Math.PI,a0=a,a1=a+sw;a=a1;const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),xi0=cx+ri*Math.cos(a0),yi0=cy+ri*Math.sin(a0),xi1=cx+ri*Math.cos(a1),yi1=cy+ri*Math.sin(a1),lg=sw>Math.PI?1:0;return{...d,path:`M${x0},${y0} A${r},${r} 0 ${lg} 1 ${x1},${y1} L${xi1},${yi1} A${ri},${ri} 0 ${lg} 0 ${xi0},${yi0} Z`};});return React.createElement('svg',{width:'100%',viewBox:'0 0 280 160',style:{overflow:'visible'}},sl.map((s,i)=>React.createElement('path',{key:i,d:s.path,fill:colorFn(s.name),opacity:tt&&tt.name!==s.name?0.6:1,style:{cursor:'pointer'},onMouseEnter:()=>setTt(s),onMouseLeave:()=>setTt(null)})),tt&&React.createElement('g',null,React.createElement('rect',{x:162,y:10,width:112,height:40,rx:4,fill:'#07120e',stroke:'#1f4439'}),React.createElement('text',{x:167,y:26,fill:'#ecfdf5',fontSize:11,fontWeight:600},tt.name),React.createElement('text',{x:167,y:42,fill:'#8fb3a6',fontSize:11},'$'+Math.abs(tt.value).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))));}
 function SvgBar({data}){const [tt,setTt]=React.useState(null);if(!data||!data.length)return null;const W=320,H=150,pL=42,pB=22,pT=12,pR=8,cW=W-pL-pR,cH=H-pB-pT,mx=Math.max(...data.flatMap(d=>[d.Income||0,d.Expenses||0]),1),gW=cW/data.length,bW=Math.max(4,Math.floor(gW/2)-3);return React.createElement('svg',{width:'100%',viewBox:`0 0 ${W} ${H}`,style:{overflow:'visible'}},[0,0.5,1].map((f,i)=>{const v=Math.round(mx*f),y=pT+(cH-(v/mx)*cH);return React.createElement('g',{key:i},React.createElement('line',{x1:pL,y1:y,x2:pL+cW,y2:y,stroke:'#15302a',strokeWidth:1}),React.createElement('text',{x:pL-4,y:y+4,fill:'#8fb3a6',fontSize:9,textAnchor:'end'},v>=1000?`$${(v/1000).toFixed(0)}k`:`$${v}`));}),data.map((d,i)=>{const gx=pL+i*gW,iH=((d.Income||0)/mx)*cH,eH=((d.Expenses||0)/mx)*cH;return React.createElement('g',{key:i,onMouseEnter:()=>setTt(d),onMouseLeave:()=>setTt(null),style:{cursor:'pointer'}},React.createElement('rect',{x:gx+gW/2-bW-1,y:pT+cH-iH,width:bW,height:Math.max(1,iH),fill:'#4ade80',rx:2}),React.createElement('rect',{x:gx+gW/2+1,y:pT+cH-eH,width:bW,height:Math.max(1,eH),fill:'#f87171',rx:2}),React.createElement('text',{x:gx+gW/2,y:H-pB+14,fill:'#8fb3a6',fontSize:10,textAnchor:'middle'},d.label));}),React.createElement('rect',{x:pL,y:2,width:8,height:8,fill:'#4ade80',rx:1}),React.createElement('text',{x:pL+11,y:10,fill:'#8fb3a6',fontSize:9},'Income'),React.createElement('rect',{x:pL+52,y:2,width:8,height:8,fill:'#f87171',rx:1}),React.createElement('text',{x:pL+63,y:10,fill:'#8fb3a6',fontSize:9},'Expenses'),tt&&React.createElement('g',null,React.createElement('rect',{x:W-112,y:14,width:108,height:46,rx:4,fill:'#07120e',stroke:'#1f4439'}),React.createElement('text',{x:W-107,y:28,fill:'#ecfdf5',fontSize:10,fontWeight:600},tt.label),React.createElement('text',{x:W-107,y:42,fill:'#4ade80',fontSize:10},'In: $'+(tt.Income||0).toLocaleString()),React.createElement('text',{x:W-107,y:55,fill:'#f87171',fontSize:10},'Ex: $'+(tt.Expenses||0).toLocaleString())));}
 
+
+
 // ─── Default categories ───────────────────────────────────────────────────────
 const DEFAULT_CATS = [{
   name: "Income",
@@ -1887,7 +1889,7 @@ function App() {
       padding: 40,
       color: "#8fb3a6"
     }
-  }, "Loading…");
+  }, "Loading\u2026");
   const hBtn = {
     background: "#15302a",
     color: "#ecfdf5",
@@ -2029,12 +2031,12 @@ function App() {
       fontSize: 11,
       color: "#4ade80"
     }
-  }, "● saved"), /*#__PURE__*/React.createElement("span", {
+  }, "\u25CF saved"), /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 10,
       color: "#6a8c80"
     }
-  }, "v3.3"), isPhone ? /*#__PURE__*/React.createElement("button", {
+  }, "v3.4"), isPhone ? /*#__PURE__*/React.createElement("button", {
     onClick: () => setMenu(true),
     style: {
       marginLeft: "auto",
@@ -2046,7 +2048,7 @@ function App() {
       padding: "0 4px"
     },
     "aria-label": "Menu"
-  }, "☰") : /*#__PURE__*/React.createElement("div", {
+  }, "\u2630") : /*#__PURE__*/React.createElement("div", {
     style: {
       marginLeft: "auto",
       display: "flex",
@@ -2063,16 +2065,16 @@ function App() {
       border: "none",
       fontWeight: 700
     }
-  }, "⬇ Export JSON"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2B07 Export JSON"), /*#__PURE__*/React.createElement("button", {
     onClick: copyJSON,
     style: hBtn
-  }, "📋 Copy JSON"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCCB Copy JSON"), /*#__PURE__*/React.createElement("button", {
     onClick: () => importRef.current.click(),
     style: hBtn
-  }, "⬆ Import JSON"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2B06 Import JSON"), /*#__PURE__*/React.createElement("button", {
     onClick: openSettings,
     style: hBtn
-  }, "⚙ Settings"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2699 Settings"), /*#__PURE__*/React.createElement("button", {
     onClick: clearData,
     style: {
       ...hBtn,
@@ -2273,7 +2275,7 @@ function App() {
       marginBottom: 14,
       textAlign: "left"
     }
-  }, "⚙ Settings · Drive sync, app lock, reminders, backups"), /*#__PURE__*/React.createElement("div", {
+  }, "\u2699 Settings \xB7 Drive sync, app lock, reminders, backups"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: "#8fb3a6",
@@ -2298,21 +2300,21 @@ function App() {
       border: "none",
       fontWeight: 700
     }
-  }, "⬇ Export backup"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2B07 Export backup"), /*#__PURE__*/React.createElement("button", {
     onClick: () => importRef.current.click(),
     style: {
       ...hBtn,
       fontSize: 14,
       padding: "12px"
     }
-  }, "⬆ Import backup"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2B06 Import backup"), /*#__PURE__*/React.createElement("button", {
     onClick: copyJSON,
     style: {
       ...hBtn,
       fontSize: 14,
       padding: "12px"
     }
-  }, "📋 Copy backup to clipboard"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCCB Copy backup to clipboard"), /*#__PURE__*/React.createElement("button", {
     onClick: clearData,
     style: {
       ...hBtn,
@@ -2395,7 +2397,7 @@ function TrackedCard({
       fontSize: 14,
       padding: 0
     }
-  }, "✓"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEditing(false),
     style: {
       background: "none",
@@ -2405,7 +2407,7 @@ function TrackedCard({
       fontSize: 14,
       padding: 0
     }
-  }, "×")) : /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")) : /*#__PURE__*/React.createElement("div", {
     onClick: () => {
       setEditing(true);
       setVal(String(budget || ""));
@@ -2545,7 +2547,7 @@ function Dashboard({
       cursor: "pointer",
       fontSize: 12
     }
-  }, "Manage →")), /*#__PURE__*/React.createElement("div", {
+  }, "Manage \u2192")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(140px,1fr))",
@@ -2615,7 +2617,7 @@ function Dashboard({
       textTransform: "uppercase",
       letterSpacing: "0.06em"
     }
-  }, "Coming up · next 7 days"), /*#__PURE__*/React.createElement("div", {
+  }, "Coming up \xB7 next 7 days"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "column",
@@ -2684,7 +2686,7 @@ function Dashboard({
       padding: "6px 12px",
       fontSize: 12
     }
-  }, "Open calendar →")), trackedCats.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "Open calendar \u2192")), trackedCats.length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1f19",
       border: "1px solid #15302a",
@@ -2833,7 +2835,7 @@ function Dashboard({
       style: {
         color: "#8fb3a6"
       }
-    }, fmt(g.current), " / ", fmt(g.target), " — ", Math.round(pct), "%")), /*#__PURE__*/React.createElement("div", {
+    }, fmt(g.current), " / ", fmt(g.target), " \u2014 ", Math.round(pct), "%")), /*#__PURE__*/React.createElement("div", {
       style: {
         background: "#15302a",
         borderRadius: 4,
@@ -2867,7 +2869,7 @@ function Dashboard({
       color: "#6a8c80",
       marginBottom: 12
     }
-  }, "Running total of uncleared charges. Log a payment to reduce the balance — partial payments are fine."), /*#__PURE__*/React.createElement("div", {
+  }, "Running total of uncleared charges. Log a payment to reduce the balance \u2014 partial payments are fine."), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(230px,1fr))",
@@ -3022,7 +3024,7 @@ function CcPaymentCard({
       padding: "6px 0",
       fontSize: 12
     }
-  }, "💳 Payment"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCB3 Payment"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setMode("interest");
       setActionDate(today());
@@ -3037,7 +3039,7 @@ function CcPaymentCard({
       padding: "6px 0",
       fontSize: 12
     }
-  }, "📈 Interest"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCC8 Interest"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setMode("set");
       setSetAmt(String(balance.toFixed(2)));
@@ -3052,7 +3054,7 @@ function CcPaymentCard({
       padding: "6px 10px",
       fontSize: 12
     }
-  }, "✏")), mode === "set" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, "\u270F")), mode === "set" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: "#8fb3a6",
@@ -3190,7 +3192,7 @@ function CcPaymentCard({
       fontSize: 12,
       fontWeight: 700
     }
-  }, "✓ Confirm"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713 Confirm"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setMode(null);
       setPayAmt("");
@@ -3468,7 +3470,7 @@ function Accounts({
       color: "#6a8c80",
       fontSize: 14
     }
-  }, "−"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, "\u2212"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: "#8fb3a6",
@@ -3587,7 +3589,7 @@ function Accounts({
         color: a?.color || "#94a3b8",
         border: `1px solid ${a?.color || "#94a3b8"}44`
       }
-    }, fmt(d.amount), " → ", a?.name);
+    }, fmt(d.amount), " \u2192 ", a?.name);
   }), /*#__PURE__*/React.createElement("span", {
     style: {
       color: "#6a8c80",
@@ -3604,7 +3606,7 @@ function Accounts({
         color: to?.color || "#94a3b8",
         border: `1px solid ${to?.color || "#94a3b8"}44`
       }
-    }, fmt(tr.amount), " → ", to?.name);
+    }, fmt(tr.amount), " \u2192 ", to?.name);
   }), /*#__PURE__*/React.createElement("span", {
     style: {
       color: "#6a8c80",
@@ -3618,7 +3620,7 @@ function Accounts({
       color: "#6ee7b7",
       border: "1px solid #6ee7b744"
     }
-  }, fmt(cfg.weeklyTransfer.amount), " → Spend"))), /*#__PURE__*/React.createElement("div", {
+  }, fmt(cfg.weeklyTransfer.amount), " \u2192 Spend"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
@@ -3648,7 +3650,7 @@ function Accounts({
       fontSize: 13,
       fontWeight: 600
     }
-  }, "↔ Manual Transfer"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2194 Manual Transfer"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setShowPaySetup(v => !v);
       setShowPayday(false);
@@ -3666,7 +3668,7 @@ function Accounts({
       fontSize: 13,
       fontWeight: 600
     }
-  }, "⚙ Pay Setup")), showPaySetup && editPay && /*#__PURE__*/React.createElement("div", {
+  }, "\u2699 Pay Setup")), showPaySetup && editPay && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1f19",
       border: "1px solid #a78bfa33",
@@ -3683,7 +3685,7 @@ function Accounts({
       textTransform: "uppercase",
       letterSpacing: "0.06em"
     }
-  }, "⚙ Pay Setup"), /*#__PURE__*/React.createElement("div", {
+  }, "\u2699 Pay Setup"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: "#8fb3a6",
@@ -3859,7 +3861,7 @@ function Accounts({
       cursor: "pointer",
       fontSize: 16
     }
-  }, "×"))), /*#__PURE__*/React.createElement("button", {
+  }, "\xD7"))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEditPay(p => ({
       ...p,
       deposits: [...p.deposits, {
@@ -3923,7 +3925,7 @@ function Accounts({
     style: {
       color: "#6a8c80"
     }
-  }, "→"), /*#__PURE__*/React.createElement("select", {
+  }, "\u2192"), /*#__PURE__*/React.createElement("select", {
     value: tr.toId,
     onChange: e => setEditPay(p => ({
       ...p,
@@ -3983,7 +3985,7 @@ function Accounts({
       cursor: "pointer",
       fontSize: 16
     }
-  }, "×"))), /*#__PURE__*/React.createElement("button", {
+  }, "\xD7"))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEditPay(p => ({
       ...p,
       paydayTransfers: [...p.paydayTransfers, {
@@ -4041,7 +4043,7 @@ function Accounts({
     style: {
       color: "#6a8c80"
     }
-  }, "→"), /*#__PURE__*/React.createElement("select", {
+  }, "\u2192"), /*#__PURE__*/React.createElement("select", {
     value: editPay.weeklyTransfer.toId,
     onChange: e => setEditPay(p => ({
       ...p,
@@ -4109,7 +4111,7 @@ function Accounts({
       cursor: "pointer",
       fontSize: 13
     }
-  }, "✓ Save Pay Setup"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713 Save Pay Setup"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowPaySetup(false),
     style: {
       background: "#15302a",
@@ -4137,7 +4139,7 @@ function Accounts({
       textTransform: "uppercase",
       letterSpacing: "0.06em"
     }
-  }, "Log Payday — ", fmt(cfg.takehome), " Take-Home"), /*#__PURE__*/React.createElement("div", {
+  }, "Log Payday \u2014 ", fmt(cfg.takehome), " Take-Home"), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 12
     }
@@ -4210,7 +4212,7 @@ function Accounts({
       style: {
         color: "#60a5fa"
       }
-    }, "↔ ", fmt(tr.amount)), /*#__PURE__*/React.createElement("span", {
+    }, "\u2194 ", fmt(tr.amount)), /*#__PURE__*/React.createElement("span", {
       style: {
         color: "#8fb3a6"
       }
@@ -4222,7 +4224,7 @@ function Accounts({
       style: {
         color: "#6a8c80"
       }
-    }, " → "), /*#__PURE__*/React.createElement("span", {
+    }, " \u2192 "), /*#__PURE__*/React.createElement("span", {
       style: {
         color: to?.color
       }
@@ -4244,7 +4246,7 @@ function Accounts({
       cursor: "pointer",
       fontSize: 13
     }
-  }, "✓ Log Payday"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713 Log Payday"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowPayday(false),
     style: {
       background: "#15302a",
@@ -4272,7 +4274,7 @@ function Accounts({
       textTransform: "uppercase",
       letterSpacing: "0.06em"
     }
-  }, "Log Weekly Transfer — Reserve → Spend"), /*#__PURE__*/React.createElement("div", {
+  }, "Log Weekly Transfer \u2014 Reserve \u2192 Spend"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
@@ -4296,7 +4298,7 @@ function Accounts({
     style: {
       color: accMap["acc2"]?.color
     }
-  }, "Reserve"), " → ", /*#__PURE__*/React.createElement("span", {
+  }, "Reserve"), " \u2192 ", /*#__PURE__*/React.createElement("span", {
     style: {
       color: accMap["acc1"]?.color
     }
@@ -4317,7 +4319,7 @@ function Accounts({
       cursor: "pointer",
       fontSize: 13
     }
-  }, "✓ Log Transfer"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713 Log Transfer"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowWeekly(false),
     style: {
       background: "#15302a",
@@ -4381,7 +4383,7 @@ function Accounts({
       color: "#8fb3a6",
       fontSize: 16
     }
-  }, "→"), /*#__PURE__*/React.createElement("select", {
+  }, "\u2192"), /*#__PURE__*/React.createElement("select", {
     style: {
       ...inp,
       width: 150
@@ -4494,7 +4496,7 @@ function Accounts({
       fontSize: 11,
       padding: "1px 4px"
     }
-  }, "✏ bal"), /*#__PURE__*/React.createElement("button", {
+  }, "\u270F bal"), /*#__PURE__*/React.createElement("button", {
     onClick: e => {
       e.stopPropagation();
       setEditNotesId(editNotesId === a.id ? null : a.id);
@@ -4509,7 +4511,7 @@ function Accounts({
       fontSize: 11,
       padding: "1px 4px"
     }
-  }, "✏ note"))), editBalId === a.id ? /*#__PURE__*/React.createElement("div", {
+  }, "\u270F note"))), editBalId === a.id ? /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 5,
@@ -4543,7 +4545,7 @@ function Accounts({
       padding: "3px 8px",
       fontSize: 12
     }
-  }, "✓"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEditBalId(null),
     style: {
       background: "none",
@@ -4552,7 +4554,7 @@ function Accounts({
       cursor: "pointer",
       fontSize: 15
     }
-  }, "×")) : /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")) : /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 22,
       fontWeight: 700,
@@ -4576,7 +4578,7 @@ function Accounts({
       padding: "6px 8px",
       lineHeight: 1.5
     },
-    placeholder: "Add a note about this account…"
+    placeholder: "Add a note about this account\u2026"
   }), /*#__PURE__*/React.createElement("button", {
     onClick: e => {
       e.stopPropagation();
@@ -4614,7 +4616,7 @@ function Accounts({
       color: "#46655b",
       fontStyle: "italic"
     }
-  }, "Add note…")), /*#__PURE__*/React.createElement(StmtBadge, {
+  }, "Add note\u2026")), /*#__PURE__*/React.createElement(StmtBadge, {
     entry: stmtLog?.[a.id]
   })))), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -4645,7 +4647,7 @@ function Accounts({
       marginBottom: 10,
       color: acc.color
     }
-  }, acc.name, " — Transaction History (", accTxns.length, " entries)"), accTxns.length === 0 ? /*#__PURE__*/React.createElement("div", {
+  }, acc.name, " \u2014 Transaction History (", accTxns.length, " entries)"), accTxns.length === 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
       color: "#8fb3a6",
       fontSize: 13,
@@ -4705,7 +4707,7 @@ function Accounts({
       textAlign: "center",
       padding: 8
     }
-  }, "Showing 50 of ", accTxns.length, " — filter in Transactions tab for full history"))));
+  }, "Showing 50 of ", accTxns.length, " \u2014 filter in Transactions tab for full history"))));
 }
 
 // ─── Bills ────────────────────────────────────────────────────────────────────
@@ -4984,7 +4986,7 @@ function Bills({
       color: "#6a8c80",
       marginTop: 2
     }
-  }, "Weekly × 4.33, annual ÷ 12")), /*#__PURE__*/React.createElement("div", {
+  }, "Weekly \xD7 4.33, annual \xF7 12")), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1f19",
       border: "1px solid #15302a",
@@ -5186,7 +5188,7 @@ function Bills({
       ...inp,
       width: 60
     },
-    placeholder: "1–31",
+    placeholder: "1\u201331",
     value: form.dueDay,
     onChange: e => setForm(p => ({
       ...p,
@@ -5514,7 +5516,7 @@ function Bills({
           border: `1px solid ${color}44`,
           whiteSpace: "nowrap"
         }
-      }, "💳 ", cc?.label);
+      }, "\uD83D\uDCB3 ", cc?.label);
     })(), bill.accountId && accounts.find(a => a.id === bill.accountId) && (() => {
       const acc = accounts.find(a => a.id === bill.accountId);
       return /*#__PURE__*/React.createElement("span", {
@@ -5545,7 +5547,7 @@ function Bills({
         padding: "5px 10px",
         fontSize: 12
       }
-    }, "✓ Paid"), /*#__PURE__*/React.createElement("button", {
+    }, "\u2713 Paid"), /*#__PURE__*/React.createElement("button", {
       onClick: () => startEdit(bill),
       style: {
         background: "#15302a",
@@ -5556,7 +5558,7 @@ function Bills({
         padding: "5px 10px",
         fontSize: 12
       }
-    }, "✏"), /*#__PURE__*/React.createElement("button", {
+    }, "\u270F"), /*#__PURE__*/React.createElement("button", {
       onClick: () => removeBill(bill.id),
       style: {
         background: "#15302a",
@@ -5567,7 +5569,7 @@ function Bills({
         padding: "5px 10px",
         fontSize: 12
       }
-    }, "🗑"))));
+    }, "\uD83D\uDDD1"))));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 14,
@@ -5579,7 +5581,7 @@ function Bills({
       color: "#6a8c80",
       lineHeight: 1.6
     }
-  }, "💡 ", /*#__PURE__*/React.createElement("strong", {
+  }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("strong", {
     style: {
       color: "#8fb3a6"
     }
@@ -5587,7 +5589,7 @@ function Bills({
     style: {
       color: "#4ade80"
     }
-  }, "✓ Paid"), " on a manual bill to automatically log it as a transaction. Autopay bills don't need this — just add them manually to Transactions when they clear. Bills are saved in your JSON export."));
+  }, "\u2713 Paid"), " on a manual bill to automatically log it as a transaction. Autopay bills don't need this \u2014 just add them manually to Transactions when they clear. Bills are saved in your JSON export."));
 }
 
 // ─── Phone layout helper ──────────────────────────────────────────────────────
@@ -6029,7 +6031,7 @@ function ScheduleEditor({
     })
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
-  }, "Choose…"), accounts.map(a => /*#__PURE__*/React.createElement("option", {
+  }, "Choose\u2026"), accounts.map(a => /*#__PURE__*/React.createElement("option", {
     key: a.id,
     value: a.id
   }, a.name)))), /*#__PURE__*/React.createElement("div", {
@@ -6046,7 +6048,7 @@ function ScheduleEditor({
     })
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
-  }, "Choose…"), accounts.map(a => /*#__PURE__*/React.createElement("option", {
+  }, "Choose\u2026"), accounts.map(a => /*#__PURE__*/React.createElement("option", {
     key: a.id,
     value: a.id
   }, a.name))))) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -6258,7 +6260,7 @@ function Sheet({
       cursor: "pointer",
       lineHeight: 1
     }
-  }, "×")), children));
+  }, "\xD7")), children));
 }
 
 // ─── Calendar tab ─────────────────────────────────────────────────────────────
@@ -6382,7 +6384,7 @@ function CalendarTab({
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => shift(-1),
     style: navBtn
-  }, "‹"), /*#__PURE__*/React.createElement("div", {
+  }, "\u2039"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 20,
       fontWeight: 700,
@@ -6395,7 +6397,7 @@ function CalendarTab({
   })), /*#__PURE__*/React.createElement("button", {
     onClick: () => shift(1),
     style: navBtn
-  }, "›"), /*#__PURE__*/React.createElement("button", {
+  }, "\u203A"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setMonth(t.slice(0, 7));
       setSel(t);
@@ -6437,7 +6439,7 @@ function CalendarTab({
       fontSize: 13,
       cursor: "pointer"
     }
-  }, "🔁 Subscriptions", subAlerts ? ` · ${subAlerts}` : "")), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDD01 Subscriptions", subAlerts ? ` · ${subAlerts}` : "")), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1f19",
       border: "1px solid #15302a",
@@ -6630,7 +6632,7 @@ function CalendarTab({
         color: "#8fb3a6",
         marginTop: 2
       }
-    }, route, " · ", SCHED_FREQS.find(f => f[0] === item.freq)?.[1])), /*#__PURE__*/React.createElement("div", {
+    }, route, " \xB7 ", SCHED_FREQS.find(f => f[0] === item.freq)?.[1])), /*#__PURE__*/React.createElement("div", {
       style: {
         textAlign: "right",
         flexShrink: 0
@@ -6758,10 +6760,10 @@ function CalendarTab({
         fontSize: 11,
         color: "#6a8c80"
       }
-    }, SCHED_FREQS.find(f => f[0] === item.freq)?.[1], " · next ", next ? dateOf(next).toLocaleDateString("default", {
+    }, SCHED_FREQS.find(f => f[0] === item.freq)?.[1], " \xB7 next ", next ? dateOf(next).toLocaleDateString("default", {
       month: "short",
       day: "numeric"
-    }) : "—", " · ", item.autoPost ? "auto" : "reminder")), /*#__PURE__*/React.createElement("div", {
+    }) : "—", " \xB7 ", item.autoPost ? "auto" : "reminder")), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 13,
         fontWeight: 600
@@ -7192,7 +7194,7 @@ function BitcoinTab({
       fontSize: 20,
       fontWeight: 700
     }
-  }, "₿ Bitcoin"), buys.length === 0 && /*#__PURE__*/React.createElement("div", {
+  }, "\u20BF Bitcoin"), buys.length === 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       ...card,
       borderColor: "#f7931a55"
@@ -7209,7 +7211,7 @@ function BitcoinTab({
       color: "#8fb3a6",
       lineHeight: 1.6
     }
-  }, "In Google Sheets: ", /*#__PURE__*/React.createElement("b", null, "File → Download → Comma-separated values (.csv)"), ", then tap ", /*#__PURE__*/React.createElement("b", null, "Import sheet"), " below and pick that file. It reads the DATE, INVESTED and BITCOIN PURCHASED columns. The file stays on this phone.")), /*#__PURE__*/React.createElement("div", {
+  }, "In Google Sheets: ", /*#__PURE__*/React.createElement("b", null, "File \u2192 Download \u2192 Comma-separated values (.csv)"), ", then tap ", /*#__PURE__*/React.createElement("b", null, "Import sheet"), " below and pick that file. It reads the DATE, INVESTED and BITCOIN PURCHASED columns. The file stays on this phone.")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(2, minmax(0,1fr))",
@@ -7341,7 +7343,7 @@ function BitcoinTab({
       color: "#6a8c80",
       marginBottom: 8
     }
-  }, "Price paid (dollars ÷ BTC) is more than 20% away from the buys around it. Usually a typo in the dollars or the BTC, or a dollar amount on the wrong row."), suspect.slice().reverse().map(f => editBuy && editBuy.id === f.b.id ? /*#__PURE__*/React.createElement("div", {
+  }, "Price paid (dollars \xF7 BTC) is more than 20% away from the buys around it. Usually a typo in the dollars or the BTC, or a dollar amount on the wrong row."), suspect.slice().reverse().map(f => editBuy && editBuy.id === f.b.id ? /*#__PURE__*/React.createElement("div", {
     key: f.b.id
   }, renderEditor()) : /*#__PURE__*/React.createElement("div", {
     key: f.b.id,
@@ -7362,7 +7364,7 @@ function BitcoinTab({
     style: {
       fontSize: 13
     }
-  }, f.b.date, " · ", fmt(f.b.usd), " for ", /*#__PURE__*/React.createElement("span", {
+  }, f.b.date, " \xB7 ", fmt(f.b.usd), " for ", /*#__PURE__*/React.createElement("span", {
     style: {
       fontFamily: "monospace",
       color: "#f7931a"
@@ -7371,7 +7373,7 @@ function BitcoinTab({
     style: {
       color: "#8fb3a6"
     }
-  }, "Paid ", fmt(f.price), "/BTC · nearby buys ≈ ", fmt(f.typical), " (", f.off > 0 ? "+" : "", Math.round(f.off * 100), "%)")), /*#__PURE__*/React.createElement("button", {
+  }, "Paid ", fmt(f.price), "/BTC \xB7 nearby buys \u2248 ", fmt(f.typical), " (", f.off > 0 ? "+" : "", Math.round(f.off * 100), "%)")), /*#__PURE__*/React.createElement("button", {
     onClick: () => setEditBuy({
       id: f.b.id,
       date: f.b.date,
@@ -7379,7 +7381,7 @@ function BitcoinTab({
       btc: f.b.btc.toFixed(8)
     }),
     style: smallBtn("#ecfdf5")
-  }, "✏ Fix")))), pending.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "\u270F Fix")))), pending.length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       ...card,
       borderColor: "#facc1555"
@@ -7404,7 +7406,7 @@ function BitcoinTab({
       fontSize: 13,
       flex: 1
     }
-  }, b.date, " · ", fmt(b.usd)), /*#__PURE__*/React.createElement("input", {
+  }, b.date, " \xB7 ", fmt(b.usd)), /*#__PURE__*/React.createElement("input", {
     style: {
       ...inp,
       width: 130,
@@ -7482,7 +7484,7 @@ function BitcoinTab({
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => fileRef.current.click(),
     style: smallBtn("#ecfdf5")
-  }, "📄 Import sheet (.csv)"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCC4 Import sheet (.csv)"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPaste(v => !v),
     style: smallBtn("#8fb3a6")
   }, "Paste rows instead"), /*#__PURE__*/React.createElement("input", {
@@ -7577,7 +7579,7 @@ function BitcoinTab({
       fontSize: 14,
       cursor: "pointer"
     }
-  }, "✏"), /*#__PURE__*/React.createElement("button", {
+  }, "\u270F"), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       if (confirm(`Delete the ${b.date} buy of ${fmt(b.usd)}?`)) del(b.id);
     },
@@ -7589,7 +7591,7 @@ function BitcoinTab({
       fontSize: 16,
       cursor: "pointer"
     }
-  }, "×"))), buys.length > 12 && /*#__PURE__*/React.createElement("button", {
+  }, "\xD7"))), buys.length > 12 && /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowAll(v => !v),
     style: {
       ...smallBtn("#8fb3a6"),
@@ -7833,7 +7835,7 @@ function BtcChart({
       y: pT + 76,
       fill: "#8fb3a6",
       fontSize: "11"
-    }, "Buy ", fmt(tip.usd), " → ", tip.btc.toFixed(8)));
+    }, "Buy ", fmt(tip.usd), " \u2192 ", tip.btc.toFixed(8)));
   })());
 }
 
@@ -7851,10 +7853,16 @@ function classifyLine(desc, credit) {
 }
 function cleanDescription(raw) {
   for (const [re, name] of MERCHANT_RULES) if (name && re.test(raw)) return name;
-  let s = " " + String(raw).replace(/\s+(DEBIT CARD PURCHASE|POS PURCHASE|RECURRING DEBIT CARD|ACH (WEB|DEBIT|CREDIT)|DEBIT CARD)\b.*$/i, "") + " ";
+  // PNC puts the card's last 4 and the type first ("1388 Debit Card Purchase Starbucks Store"): keep what follows
+  let body = String(raw);
+  const lead = body.match(/^\s*(?:\d{4}\s+)?(?:recurring\s+debit\s+card|debit\s+card\s+purchase|pos\s+purchase|debit\s+card)\s+(.+)$/i);
+  if (lead) body = lead[1];
+  let s = " " + body.replace(/\s+(DEBIT CARD PURCHASE|POS PURCHASE|RECURRING DEBIT CARD|ACH (WEB|DEBIT|CREDIT)|DEBIT CARD)\b.*$/i, "") + " ";
   s = s.replace(/\s[xX]{2,}\w*/g, " "); // masked card / reference numbers
   s = s.replace(/\s[A-Z0-9]*\d[A-Z0-9]*[A-Z][A-Z0-9]*(?=\s)/g, m => m.trim().length >= 10 ? " " : m); // reference codes
   s = s.replace(/\s\d{6,}(?=\s)/g, " "); // long numbers
+  s = s.replace(/\s\d{3}\s?\d{3}-\d{3,4}(?=\s)/g, " "); // wrapped phone numbers ("888 432-329")
+  s = s.replace(/\s(?!(?:19|20)\d\d\s)\d{4,5}(?=\s)/g, " "); // store numbers ("Subway 4416"), not years
   s = s.replace(/\s#\s?\d+/g, " "); // store numbers
   s = s.replace(/\d{3}-\d{3}-?\d{4}|\d{3}-\d{7}|\d{3}-[A-Z]+(?=\s)/gi, " "); // phone numbers
   s = s.replace(/\s(SQ|TST|PAYPAL|PP)\s?\*\s?/gi, " "); // processor prefixes
@@ -7892,8 +7900,12 @@ function makeRow(month, day, year, rawDesc, amount, credit) {
     category: suggestCategory(rawDesc, kind)
   };
 }
+
+// PNC prints a summary column beside the rows; cut that text off a description
+const pncSide = t => t.replace(/(?:^|\s+)(There were\b|PIN POS\b|PIN\s*$|purchases totaling|Machine\/Debit|Banking Deductions|deductions totaling|totaling\b|\$[\d,]+\.\d{2}\.?).*$/i, "").trim();
 function parseStatementLines(lines) {
   const rows = [];
+  let lastPnc = null; // a PNC row whose description may continue on the next line
   let section = null,
     skipLoan = false,
     bank = false; // section: bank-statement column ("credit" / "debit")
@@ -7927,7 +7939,18 @@ function parseStatementLines(lines) {
     let m,
       r = null;
     if (section && (m = l.match(PNC_ROW))) {
-      r = makeRow(+m[1], +m[2], null, m[4], parseFloat(m[3].replace(/,/g, "")), section === "credit");
+      r = makeRow(+m[1], +m[2], null, pncSide(m[4]), parseFloat(m[3].replace(/,/g, "")), section === "credit");
+      lastPnc = r;
+    } else if (section && lastPnc) {
+      // The merchant name often wraps onto the next line ("Wades Breakfast" / "and Gr")
+      const more = pncSide(l);
+      const wraps = /^(\d{4}\s+)?(recurring\s+)?debit\s+card|^pos\s+purchase|^atm\s+withdrawal/i.test(lastPnc.rawDesc);
+      if (wraps && more && more.length <= 30 && !/^(date|amount|description|page\b|continued|total|withdrawals|banking|deposits|virtual wallet|account|balance)|statement/i.test(more)) {
+        const fixed = makeRow(lastPnc.month, lastPnc.day, null, lastPnc.rawDesc + " " + more, lastPnc.amount, lastPnc.credit);
+        if (fixed) Object.assign(lastPnc, fixed);
+      }
+      lastPnc = null;
+      continue;
     } else if (m = l.match(BAL_ROW)) {
       // date, description, amount, running balance
       if (/beginning\s+balance|ending\s+balance/i.test(m[4])) continue;
@@ -8046,7 +8069,7 @@ function StmtBadge({
       color: "#6a8c80",
       marginTop: 5
     }
-  }, "📄 No PDF statement checked yet");
+  }, "\uD83D\uDCC4 No PDF statement checked yet");
   const age = Math.round((dateOf(localToday()) - dateOf(entry.thru)) / 86400000);
   const color = age <= 40 ? "#4ade80" : age <= 70 ? "#facc15" : "#f87171";
   return /*#__PURE__*/React.createElement("div", {
@@ -8056,11 +8079,11 @@ function StmtBadge({
       marginTop: 5
     },
     title: entry.file || ""
-  }, "📄 Statement thru ", short(entry.thru), entry.balanced === false ? " · balance off" : "", /*#__PURE__*/React.createElement("span", {
+  }, "\uD83D\uDCC4 Statement thru ", short(entry.thru), entry.balanced === false ? " · balance off" : "", /*#__PURE__*/React.createElement("span", {
     style: {
       color: "#6a8c80"
     }
-  }, " · checked ", short(entry.checkedAt)));
+  }, " \xB7 checked ", short(entry.checkedAt)));
 }
 
 // ─── Statement check (reconcile a statement against the app) ─────────────────
@@ -8440,7 +8463,14 @@ function StatementCheck({
     });
     const delIds = new Set(res.extra.filter(e => res.del[e.key]).map(e => e.key));
     const fixes = Object.fromEntries(res.differs.filter(d => res.fix[d.s.key]).map(d => [d.a.key, d]));
+    // Earlier imports saved PNC card purchases as just the card's last 4 ("1388"): give matched ones their real name
+    const badName = d => /^\s*(\d{3,5}|purchase|debit card( purchase)?)\s*$/i.test(d || "");
+    const renames = Object.fromEntries(res.matched.filter(m => !m.combined && badName(m.a.desc) && m.s.row && m.s.row.desc && !badName(m.s.row.desc)).map(m => [m.a.key, m.s.row.desc]));
     setTxns(prev => [...add, ...prev.filter(t => !delIds.has(t.id)).map(t => {
+      if (renames[t.id]) t = {
+        ...t,
+        desc: renames[t.id]
+      };
       const d = fixes[t.id];
       if (!d) return t;
       const newSide = d.s.signed;
@@ -8475,7 +8505,8 @@ function StatementCheck({
         }
       }));
     }
-    onDone(`${label}: ${add.length} added, ${delIds.size} removed, ${Object.keys(fixes).length} corrected.${setBal ? " Balance set to the statement." : ""}`);
+    const nRen = Object.keys(renames).length;
+    onDone(`${label}: ${add.length} added, ${delIds.size} removed, ${Object.keys(fixes).length} corrected${nRen ? `, ${nRen} renamed` : ""}.${setBal ? " Balance set to the statement." : ""}`);
   };
   const inp = {
     background: "#07120e",
@@ -8584,7 +8615,7 @@ function StatementCheck({
       cursor: "pointer",
       fontSize: 20
     }
-  }, "×")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#8fb3a6",
@@ -8657,14 +8688,14 @@ function StatementCheck({
       color: "#8fb3a6",
       margin: "10px 0 8px"
     }
-  }, fileName, " · ", label, " · ", dateOf(res.from).toLocaleDateString("default", {
+  }, fileName, " \xB7 ", label, " \xB7 ", dateOf(res.from).toLocaleDateString("default", {
     month: "short",
     day: "numeric"
-  }), " – ", dateOf(res.to).toLocaleDateString("default", {
+  }), " \u2013 ", dateOf(res.to).toLocaleDateString("default", {
     month: "short",
     day: "numeric",
     year: "numeric"
-  }), " · ", res.total, " statement lines vs ", res.appCount, " in the app", res.skipped > 0 && /*#__PURE__*/React.createElement("div", null, "Skipped ", res.skipped, " older lines from before ", res.firstApp, ", when the app's records for this account start.")), /*#__PURE__*/React.createElement("div", {
+  }), " \xB7 ", res.total, " statement lines vs ", res.appCount, " in the app", res.skipped > 0 && /*#__PURE__*/React.createElement("div", null, "Skipped ", res.skipped, " older lines from before ", res.firstApp, ", when the app's records for this account start.")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(4, minmax(0,1fr))",
@@ -8743,7 +8774,7 @@ function StatementCheck({
       color: "#4ade80",
       marginTop: 12
     }
-  }, "✓ Everything on this statement is in the app, and nothing extra. "), res.missing.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, sec("On the statement, not in the app", res.missing.length, "#facc15", "Add the ones you missed"), res.missing.map(m => line(m.row.date, m.row.desc, m.signed, /*#__PURE__*/React.createElement(React.Fragment, null, res.add[m.key] && /*#__PURE__*/React.createElement("select", {
+  }, "\u2713 Everything on this statement is in the app, and nothing extra. "), res.missing.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, sec("On the statement, not in the app", res.missing.length, "#facc15", "Add the ones you missed"), res.missing.map(m => line(m.row.date, m.row.desc, m.signed, /*#__PURE__*/React.createElement(React.Fragment, null, res.add[m.key] && /*#__PURE__*/React.createElement("select", {
     value: res.cat[m.key],
     onChange: e => setRes(r => ({
       ...r,
@@ -8787,7 +8818,7 @@ function StatementCheck({
       color: "#4ade80",
       fontSize: 13
     }
-  }, "✓"), [m.moved ? `app says ${m.a.date}` : "", m.combined ? "part of one app entry" : ""].filter(Boolean).join(" · "), m.s.key)))), /*#__PURE__*/React.createElement("div", {
+  }, "\u2713"), [m.moved ? `app says ${m.a.date}` : "", m.combined ? "part of one app entry" : ""].filter(Boolean).join(" · "), m.s.key)))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
@@ -9267,7 +9298,7 @@ function SplitEditor({
     })
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
-  }, "Category…"), cats.map(c => /*#__PURE__*/React.createElement("option", {
+  }, "Category\u2026"), cats.map(c => /*#__PURE__*/React.createElement("option", {
     key: c.name,
     value: c.name
   }, c.name))), /*#__PURE__*/React.createElement("input", {
@@ -9294,7 +9325,7 @@ function SplitEditor({
       cursor: rows.length <= 2 ? "default" : "pointer",
       padding: "0 4px"
     }
-  }, "×"))), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
@@ -9466,19 +9497,19 @@ function SubscriptionsSheet({
       color: "#8fb3a6",
       marginTop: 2
     }
-  }, freqWord[s.freq], " · ", s.count, " charges · last ", s.last, " · next about ", s.next), s.raised && /*#__PURE__*/React.createElement("div", {
+  }, freqWord[s.freq], " \xB7 ", s.count, " charges \xB7 last ", s.last, " \xB7 next about ", s.next), s.raised && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#facc15",
       marginTop: 4
     }
-  }, "⚠ Price went up from ", fmt(s.raised.from), " to ", fmt(s.raised.to)), s.cal && /*#__PURE__*/React.createElement("div", {
+  }, "\u26A0 Price went up from ", fmt(s.raised.from), " to ", fmt(s.raised.to)), s.cal && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#4ade80",
       marginTop: 4
     }
-  }, "On your calendar as “", s.cal.name, "”", s.cal.amount && Math.abs(s.cal.amount - s.amount) > 0.004 ? ` at ${fmt(s.cal.amount)}` : ""), /*#__PURE__*/React.createElement("div", {
+  }, "On your calendar as \u201C", s.cal.name, "\u201D", s.cal.amount && Math.abs(s.cal.amount - s.amount) > 0.004 ? ` at ${fmt(s.cal.amount)}` : ""), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 6,
@@ -9784,7 +9815,7 @@ function LockScreen({
       fontWeight: 700,
       cursor: "pointer"
     }
-  }, "🔓 Unlock"));
+  }, "\uD83D\uDD13 Unlock"));
 }
 
 // ─── Google Drive sync ────────────────────────────────────────────────────────
@@ -10292,7 +10323,7 @@ function SettingsSheet({
       ...main,
       flex: 1
     }
-  }, "⟳ Sync now"), /*#__PURE__*/React.createElement("button", {
+  }, "\u27F3 Sync now"), /*#__PURE__*/React.createElement("button", {
     onClick: onDisconnect,
     style: btn
   }, "Disconnect")))), native && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -10678,7 +10709,7 @@ function Transactions({
     value: "Income"
   }, "Income"), /*#__PURE__*/React.createElement("option", {
     value: "Credit Card"
-  }, "💳 Card payment"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
+  }, "\uD83D\uDCB3 Card payment"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
     key: c.name
   }, c.name))), /*#__PURE__*/React.createElement("select", {
     style: {
@@ -10719,7 +10750,7 @@ function Transactions({
       cursor: "pointer",
       fontSize: 13
     }
-  }, "✂ Split"), /*#__PURE__*/React.createElement("button", {
+  }, "\u2702 Split"), /*#__PURE__*/React.createElement("button", {
     onClick: add,
     style: {
       background: "#6ee7b7",
@@ -10742,7 +10773,7 @@ function Transactions({
       cursor: "pointer",
       fontSize: 13
     }
-  }, "🔍 Check statement"), /*#__PURE__*/React.createElement(ReceiptButton, {
+  }, "\uD83D\uDD0D Check statement"), /*#__PURE__*/React.createElement(ReceiptButton, {
     onRead: onReceipt,
     showToast: showToast
   }), /*#__PURE__*/React.createElement("input", {
@@ -10813,7 +10844,7 @@ function Transactions({
     style: {
       color: "#6a8c80"
     }
-  }, " · from \"", receipt.totalLine.slice(0, 40), "\"")), /*#__PURE__*/React.createElement("div", {
+  }, " \xB7 from \"", receipt.totalLine.slice(0, 40), "\"")), /*#__PURE__*/React.createElement("div", {
     style: {
       color: "#6a8c80"
     }
@@ -10889,7 +10920,7 @@ function Transactions({
       flex: 1,
       minWidth: 160
     },
-    placeholder: "🔍 Search…",
+    placeholder: "\uD83D\uDD0D Search\u2026",
     value: filter,
     onChange: e => setFilter(e.target.value)
   }), /*#__PURE__*/React.createElement("div", {
@@ -11011,7 +11042,7 @@ function Transactions({
       value: "Income"
     }, "Income"), /*#__PURE__*/React.createElement("option", {
       value: "Credit Card"
-    }, "💳 Card payment"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
+    }, "\uD83D\uDCB3 Card payment"), expenseCats.map(c => /*#__PURE__*/React.createElement("option", {
       key: c.name
     }, c.name))), (!pmMap[editForm.paymentMethod]?.isCreditCard || editForm.category === "Credit Card") && /*#__PURE__*/React.createElement("select", {
       style: {
@@ -11043,7 +11074,7 @@ function Transactions({
         padding: "6px 10px",
         fontSize: 12
       }
-    }, "✂ Split"), /*#__PURE__*/React.createElement("button", {
+    }, "\u2702 Split"), /*#__PURE__*/React.createElement("button", {
       onClick: saveEdit,
       style: {
         background: "#4ade8022",
@@ -11138,7 +11169,7 @@ function Transactions({
         fontSize: 11,
         color: "#8fb3a6"
       }
-    }, t.date, " · ", t.splits && t.splits.length > 1 ? "✂ " + t.splits.map(s => `${s.category} ${fmt(s.amount)}`).join(" + ") : t.category), pm && badge(pm.name, pm.color), ac && badge(ac.name, ac.color), t.source === "auto" && badge("auto", "#8fb3a6"), t.receipt && /*#__PURE__*/React.createElement("button", {
+    }, t.date, " \xB7 ", t.splits && t.splits.length > 1 ? "✂ " + t.splits.map(s => `${s.category} ${fmt(s.amount)}`).join(" + ") : t.category), pm && badge(pm.name, pm.color), ac && badge(ac.name, ac.color), t.source === "auto" && badge("auto", "#8fb3a6"), t.receipt && /*#__PURE__*/React.createElement("button", {
       onClick: () => setViewReceipt(t.receipt),
       title: "View receipt",
       style: {
@@ -11148,7 +11179,7 @@ function Transactions({
         cursor: "pointer",
         fontSize: 13
       }
-    }, "🧾"))), /*#__PURE__*/React.createElement("span", {
+    }, "\uD83E\uDDFE"))), /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 14,
         fontWeight: 600,
@@ -11168,7 +11199,7 @@ function Transactions({
         lineHeight: 1,
         padding: "0 2px"
       }
-    }, "✏"), /*#__PURE__*/React.createElement("button", {
+    }, "\u270F"), /*#__PURE__*/React.createElement("button", {
       onClick: () => deleteTransaction(t),
       title: "Delete",
       style: {
@@ -11180,7 +11211,7 @@ function Transactions({
         lineHeight: 1,
         padding: 0
       }
-    }, "×"));
+    }, "\xD7"));
   }), filtered.length > limit && /*#__PURE__*/React.createElement("button", {
     onClick: () => setLimit(l => l + 200),
     style: {
@@ -11453,13 +11484,13 @@ function GasTab({
       fontSize: 20,
       fontWeight: 700
     }
-  }, "⛽ Gas Spending"), /*#__PURE__*/React.createElement("p", {
+  }, "\u26FD Gas Spending"), /*#__PURE__*/React.createElement("p", {
     style: {
       color: "#8fb3a6",
       fontSize: 13,
       marginBottom: 16
     }
-  }, totalFillups, " fillups · ", gasTxns.length > 0 ? gasTxns[gasTxns.length - 1].date : "—", " through ", gasTxns.length > 0 ? gasTxns[0].date : "—"), /*#__PURE__*/React.createElement("div", {
+  }, totalFillups, " fillups \xB7 ", gasTxns.length > 0 ? gasTxns[gasTxns.length - 1].date : "—", " through ", gasTxns.length > 0 ? gasTxns[0].date : "—"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(155px,1fr))",
@@ -11505,7 +11536,7 @@ function GasTab({
       color: "#6a8c80",
       marginBottom: 10
     }
-  }, "Hover bars for details · dashed = 3-month rolling avg"), /*#__PURE__*/React.createElement(TrendChart, {
+  }, "Hover bars for details \xB7 dashed = 3-month rolling avg"), /*#__PURE__*/React.createElement(TrendChart, {
     data: data,
     color: "#f97316",
     showAvg: true
@@ -11687,13 +11718,13 @@ function GroceriesTab({
       fontSize: 20,
       fontWeight: 700
     }
-  }, "🛒 Grocery Spending"), /*#__PURE__*/React.createElement("p", {
+  }, "\uD83D\uDED2 Grocery Spending"), /*#__PURE__*/React.createElement("p", {
     style: {
       color: "#8fb3a6",
       fontSize: 13,
       marginBottom: 16
     }
-  }, totalTrips, " trips · ", grocTxns.length > 0 ? grocTxns[grocTxns.length - 1].date : "—", " through ", grocTxns.length > 0 ? grocTxns[0].date : "—"), /*#__PURE__*/React.createElement("div", {
+  }, totalTrips, " trips \xB7 ", grocTxns.length > 0 ? grocTxns[grocTxns.length - 1].date : "—", " through ", grocTxns.length > 0 ? grocTxns[0].date : "—"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(155px,1fr))",
@@ -11739,7 +11770,7 @@ function GroceriesTab({
       color: "#6a8c80",
       marginBottom: 10
     }
-  }, "Hover bars for details · dashed = 3-month rolling avg"), /*#__PURE__*/React.createElement(TrendChart, {
+  }, "Hover bars for details \xB7 dashed = 3-month rolling avg"), /*#__PURE__*/React.createElement(TrendChart, {
     data: data,
     color: "#4ade80",
     showAvg: true
@@ -12213,7 +12244,7 @@ function CategoryManager({
       padding: "5px 10px",
       fontSize: 12
     }
-  }, "✏ Edit"), /*#__PURE__*/React.createElement("button", {
+  }, "\u270F Edit"), /*#__PURE__*/React.createElement("button", {
     onClick: () => removeCat(cat.name),
     style: {
       background: "#15302a",
@@ -12224,7 +12255,7 @@ function CategoryManager({
       padding: "5px 10px",
       fontSize: 12
     }
-  }, "🗑")), editId === cat.name && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDDD1")), editId === cat.name && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
     onClick: () => saveEdit(cat),
     style: {
       background: "#4ade8022",
@@ -12324,7 +12355,7 @@ function Timeline({
       fontSize: 13,
       marginBottom: 18
     }
-  }, "Log events that explain shifts in your finances — new car, job change, move, etc."), /*#__PURE__*/React.createElement("div", {
+  }, "Log events that explain shifts in your finances \u2014 new car, job change, move, etc."), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1f19",
       border: "1px solid #15302a",
@@ -12450,7 +12481,7 @@ function Timeline({
       textAlign: "center",
       padding: 32
     }
-  }, "No events yet — add your first life event above."), years.map(yr => /*#__PURE__*/React.createElement("div", {
+  }, "No events yet \u2014 add your first life event above."), years.map(yr => /*#__PURE__*/React.createElement("div", {
     key: yr,
     style: {
       marginBottom: 28
@@ -12654,7 +12685,7 @@ function Timeline({
         padding: "4px 9px",
         fontSize: 12
       }
-    }, "✏"), /*#__PURE__*/React.createElement("button", {
+    }, "\u270F"), /*#__PURE__*/React.createElement("button", {
       onClick: () => remove(ev.id),
       style: {
         background: "#15302a",
@@ -12665,7 +12696,7 @@ function Timeline({
         padding: "4px 9px",
         fontSize: 12
       }
-    }, "🗑")));
+    }, "\uD83D\uDDD1")));
   })))), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "12px 14px",
@@ -12676,7 +12707,7 @@ function Timeline({
       color: "#6a8c80",
       lineHeight: 1.6
     }
-  }, "💡 ", /*#__PURE__*/React.createElement("strong", {
+  }, "\uD83D\uDCA1 ", /*#__PURE__*/React.createElement("strong", {
     style: {
       color: "#8fb3a6"
     }
