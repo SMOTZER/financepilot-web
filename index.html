@@ -2037,7 +2037,7 @@ function App() {
       fontSize: 10,
       color: "#6a8c80"
     }
-  }, "v3.5"), isPhone ? /*#__PURE__*/React.createElement("button", {
+  }, "v3.6"), isPhone ? /*#__PURE__*/React.createElement("button", {
     onClick: () => setMenu(true),
     style: {
       marginLeft: "auto",
@@ -8542,12 +8542,21 @@ function StatementCheck({
     key: key,
     style: {
       display: "flex",
+      flexWrap: "wrap",
       alignItems: "center",
       gap: 8,
       padding: "8px 10px",
       background: "#07120e",
       borderRadius: 8,
       marginBottom: 5
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: "1 1 180px",
+      minWidth: 0,
+      display: "flex",
+      alignItems: "center",
+      gap: 8
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -8573,21 +8582,45 @@ function StatementCheck({
       color: signed > 0 ? "#4ade80" : "#ecfdf5",
       flexShrink: 0
     }
-  }, signed > 0 ? "+" : "−", fmt(signed)), right);
-  const toggle = (on, onClick, yes, no, color) => /*#__PURE__*/React.createElement("button", {
-    onClick: onClick,
+  }, signed > 0 ? "+" : "−", fmt(signed))), /*#__PURE__*/React.createElement("div", {
     style: {
-      flexShrink: 0,
-      minWidth: 74,
-      padding: "5px 8px",
-      borderRadius: 6,
-      fontSize: 12,
-      cursor: "pointer",
-      border: `1px solid ${on ? color + "88" : "#1f4439"}`,
-      background: on ? color + "22" : "transparent",
-      color: on ? color : "#8fb3a6"
+      display: "flex",
+      gap: 6,
+      alignItems: "center",
+      marginLeft: "auto"
     }
-  }, on ? yes : no);
+  }, right));
+  // Two buttons side by side; the chosen one is filled, the other is dim
+  const toggle = (on, onClick, yes, no, color) => {
+    const opt = (label, chosen, c, text) => /*#__PURE__*/React.createElement("button", {
+      onClick: chosen ? undefined : onClick,
+      "aria-pressed": chosen,
+      style: {
+        minWidth: 64,
+        padding: "6px 10px",
+        fontSize: 12,
+        fontWeight: chosen ? 700 : 400,
+        cursor: chosen ? "default" : "pointer",
+        border: "none",
+        background: chosen ? c : "transparent",
+        color: chosen ? text : "#6a8c80"
+      }
+    }, chosen ? "● " : "", label);
+    return /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        flexShrink: 0,
+        border: "1px solid #1f4439",
+        borderRadius: 7,
+        overflow: "hidden"
+      }
+    }, opt(yes, on, color, "#07120e"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 1,
+        background: "#1f4439"
+      }
+    }), opt(no, !on, "#8fb3a6", "#07120e"));
+  };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1f19",
